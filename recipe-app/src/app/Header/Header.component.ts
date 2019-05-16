@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
   selector: "app-header",
   templateUrl: './Header.component.html'
 })
-export class AppHeader{
+export class HeaderComponent{
   name: string = 'header';
 
 }
