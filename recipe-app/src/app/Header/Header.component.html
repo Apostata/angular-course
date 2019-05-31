@@ -6,8 +6,12 @@
       </div>
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav mr-auto">
-          <li class="nav-item"><a class="nav-link" href="#">Recipes</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Shopping List</a></li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="onSelect('recipes')">Recipes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="onSelect('shopping-list')">Shopping List</a>
+          </li>
         </ul>
         <ul class="na navbar-nav navbar-right">
           <li class="dropdpwn nav-item">
