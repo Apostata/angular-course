@@ -6,7 +6,7 @@
         (click)="onlyOdd = !onlyOdd"
       >Mostra só impar</button>
       <ul class="list-group">
-        <div *ngIf="onlyOdd">
+        <!-- <div *ngIf="onlyOdd">
           <li
             *ngFor="let odd of oddNumbers"
             class="list-group-item"
@@ -16,7 +16,7 @@
             {{odd}}
           </li>
         </div>
-        <div *ngIf="!onlyOdd">
+        <div *appUnless="onlyOdd">
           <li
             *ngFor="let even of evenNumbers"
             class="list-group-item"
@@ -25,10 +25,34 @@
           >
           {{even}}
           </li>
+        </div> -->
+        <div *ngIf="onlyOdd; else par">
+          <div *ngFor="let odd of numbers">
+            <li
+              *ngIf="odd % 2 !== 0"
+              class="list-group-item"
+              [ngClass]="{odd: odd % 2 !== 0}"
+
+            >
+              {{odd}}
+            </li>
+          </div>
         </div>
+        <ng-template #par>
+          <div *ngFor="let even of numbers">
+            <li
+              *ngIf="even % 2 === 0"
+              class="list-group-item"
+              [ngClass]="{even: even % 2 === 0}"
+
+            >
+              {{even}}
+            </li>
+          </div>
+        </ng-template>
       </ul>
       <p appBasicHighlight >Estilizado com um diretiva customizada</p>
-      <p appBetterHighlight >Estilizado com um diretiva customizada</p>
+      <p [appBetterHighlight]="'yellow'" defaultColor="grey" >Estilizado com um diretiva customizada</p>
     </div>
   </div>
 </div>
