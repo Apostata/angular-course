@@ -1,8 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { Ingredient } from '../shared/ingredients.model';
 
-@Injectable()
-
 export class ShoppingListSercive{
 
   private ingredients: Ingredient[] = [
@@ -11,17 +9,22 @@ export class ShoppingListSercive{
   ];
 
   ingredientAdded: EventEmitter<Ingredient[]> = new EventEmitter<Ingredient[]>()
-
   getIngredients(){
-    return this.ingredients;
+    return this.ingredients.slice();
   }
   setIngredients(ingredients:Ingredient[]){
     this.ingredients = ingredients;
   }
 
-  addIngredient(name:string, amount:number){
-    const ingred = new Ingredient(name, amount)
-    this.ingredients.push(ingred);
-    this.ingredientAdded.emit(this.ingredients.slice())
+  addIngredient(ingredient: Ingredient){
+    this.ingredients.push(ingredient);
+    this.ingredientAdded.emit(this.ingredients.slice());
+  }
+
+  addIngredients(ingredients: Ingredient[]){
+    for(let i in ingredients){
+      this.ingredients.push(ingredients[i]);
+    }
+    this.ingredientAdded.emit(this.ingredients.slice());
   }
 }

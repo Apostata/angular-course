@@ -10,7 +10,8 @@ export class ShoppingEditComponent{
   constructor(private shoppingService: ShoppingListSercive) { }
 
   onAddItem(name:string, amount:number){
-    this.shoppingService.addIngredient(name, amount);
+    let ingredient = new Ingredient(name, amount);
+    this.shoppingService.addIngredient(ingredient);
   }
 
 }
