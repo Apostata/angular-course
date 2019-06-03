@@ -26,11 +26,6 @@ módulos de terceiros:
 })
 ````
 
-
-
-## Passing properties between child and parent components
-Todas a propriedades dos componentes não são acessíveis fora dos compoenentes.
-
 ## Lifecyles and lifecycle Order
 
 1. **ngOnChanges** - chamado quando com uma uma propriedade linkada de um input muda
@@ -41,4 +36,4 @@ Todas a propriedades dos componentes não são acessíveis fora dos compoenentes
 6. **ngAfterViewInit** - chamado após o componente e seus filhos serem renderizados.
 7. **ngAfterViewChecked** - chamado após componente e seus filhos serem atualizados.
 8. **ngOnDestroy** - chamado quando componente está prestes a ser removido do DOM
-![Angular Lifeclycles]('./lifecycles.jpg');
+![Angular Lifeclycles](lifecycles.jpg);

@@ -25,6 +25,7 @@ export class AppComponent {                 // classe do componente
 }                                           // possivelmente    
 
 ````
+
 ## Component selector types:
 
 ````
@@ -88,6 +89,9 @@ Ex:
 no template:
 `[(ngModel)]="{nomeDaPropriedade}"`; onde a propriedade 'nomeDaPropriedade' aceitará funcionará como
 um evento e ao mesmo tempo como alvo da renderização com a propriedade de mesmo nome no arquivo Type Script. 
+
+## Passing properties between child and parent components
+Todas a propriedades dos componentes não são acessíveis fora dos compoenentes.
 
 ### Recieving data on child component
  Para deixa-las acessíveis aos compoenentes pais, é necessário adicionar um decorator:

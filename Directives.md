@@ -5,7 +5,7 @@ São instruções no DOM
 2. Structural directive: adiciona ou remove um elemento do DOM
 **Diretivas estruturais só pode aparecer uma vez por componente**
 
-![Tipos de diretivas]('./tiposDeDiretivas.jpg');
+![Tipos de diretivas](tiposDeDiretivas.jpg);
 
 
 Normalmente utilizadas como type de seletor de atributo, Ex: `<p diretiva >Algum texto</p>` 
