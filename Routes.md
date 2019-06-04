@@ -56,9 +56,11 @@ export class AppModule { }
 </div>
 ...
 ````
-## Relative e Absolute Path
+## Navigation
 
-### Relative path
+### routerLink 
+
+#### Relative path
 É o caminho referente a página atual:
 exemplo:
 Vamos supor que estamos na página `/exemplo`;
@@ -78,7 +80,7 @@ Ao clicar no botão, ele irá para a path `/exemplo/servers`
 Ao clicar no botão, ele irá para a path `/servers`.
 *`<a class="nav-link" routerLink="../servers">Servers</a>`* irá navegar um nível de volta e acessar a rota `/servers`
 
-### Absolute path
+#### Absolute path
 É o caminho absoluto desde a página inicial `/`:
 exemplo:
 Vamos supor que estamos na página `/exemplo`;
@@ -90,7 +92,7 @@ Vamos supor que estamos na página `/exemplo`;
 
 Ao clicar no botão, ele irá para a path `/servers`
 
-## Marcando com rota ativa
+#### Marcando com rota ativa
 Passa uma determinada classe no style para mostrar como ativa ou não a rota:
 1. Necessário colocar a diretiva `routerLinkActive="{nomeDaClasseQuandoAtiva}"`.
 2. Para definir que captura exatamente a rota como é:
@@ -115,3 +117,87 @@ o que manteria todas ativas.
 </li>
 ...
 ````
+
+### Programaticaly
+
+Navegação via código ao invés da interface.
+1. Importar o `Router` do `@angular/router`.
+2. Registrar no constructor, `private router: Router`.
+3. Usar o comando com a variavel criada no constructor `this.router.navigate(['{rota}'])`; 
+
+````
+...
+import { Router } from '@angular/router';
+...
+
+@Component({
+  selector: 'app-servers',
+  templateUrl: './servers.component.html',
+  styleUrls: ['./servers.component.css']
+})
+export class ServersComponent implements OnInit {
+  ...
+
+  constructor(
+    private serversService: ServersService,
+    private router: Router
+  ) { }
+
+  reloadPage(){
+    this.router.navigate(['servers']);
+  }
+}
+
+````
+
+#### Absolute Path
+É o comportamento padrão.
+
+````
+this.router.navigate(['servers']);
+````
+
+#### Relative Path
+1. importar `Router` e `ActivatedRoute` do `@angular/router`.
+2. registrar no constructor, `private router: Router` e `private route: ActivateRouter` 
+3. usar o comando com as variáveis criada no constructor `this.router.navigate(['{rota}'], {relativeTo: this.route})` 
+
+````
+...
+import { Router, ActivatedRoute } from '@angular/router';
+...
+
+@Component({
+  selector: 'app-servers',
+  templateUrl: './servers.component.html',
+  styleUrls: ['./servers.component.css']
+})
+export class ServersComponent implements OnInit {
+  private servers: {id: number, name: string, status: string}[] = [];
+
+  constructor(
+    ...
+    private router: Router,
+    private route: ActivatedRoute
+  ) { }
+
+  ...
+  reloadPage(){
+    this.router.navigate(['servers'], {relativeTo: this.route})
+  }
+
+}
+
+````
+
+## Passing parametrer to router
+No `app.modules.ts`:
+````
+const appRoutes: Routes = [
+  { path:'', component: HomeComponent },
+  { path:'users', component: UsersComponent },
+   { path:'users/:id', component: UserComponent },
+  { path:'servers', component: ServersComponent }
+];
+````
+Fazendo com que o parametro `id` seja passado de modo dinâmico via rota. 
