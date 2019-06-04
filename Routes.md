@@ -89,3 +89,29 @@ Vamos supor que estamos na página `/exemplo`;
 ````
 
 Ao clicar no botão, ele irá para a path `/servers`
+
+## Marcando com rota ativa
+Passa uma determinada classe no style para mostrar como ativa ou não a rota:
+1. Necessário colocar a diretiva `routerLinkActive="{nomeDaClasseQuandoAtiva}"`.
+2. Para definir que captura exatamente a rota como é:
+`[routerLinkActiveOptions] ="{exact:true}"`. Isso é necessário pois todas as rotas contem `/`,
+o que manteria todas ativas.
+
+````
+...
+<li role="presentation" class="nav-item">
+    <a class="nav-link"
+    routerLinkActive="active"
+    [routerLinkActiveOptions] ="{exact:true}"
+    routerLink="/"
+    >Home
+    </a>
+</li>
+<li role="presentation" class="nav-item">
+    <a class="nav-link"
+    routerLink="/servers"
+    routerLinkActive="active"
+    >Servers</a>
+</li>
+...
+````
