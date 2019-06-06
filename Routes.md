@@ -339,3 +339,47 @@ const appRoutes: Routes = [
 ````
 Como exemplo do caso acima, nos componentes pais, `UsersComponent` e `ServersComponent`
 colocar um segundo `<router-outlet></router-outlet>` o qual renderizará as páginas filhas.
+
+### Passing queryParams to child routes
+
+Para navegar para uma página filha passando parametros recebidos pela página pai,
+
+neste exemplo navega da rota `/servers/:id` passando parametros recebidos para `/servers/:id/edit`.
+
+````
+editServer(){
+  this.router.navigate(['edit'],{ relativeTo:this.activeRoute, queryParamsHandling:'preserve'})
+}
+
+````
+
+## Trantando páginas desconhecidas:
+Mudar o `app.modules.ts` ou onde estiver array de rotas.
+
+````
+const appRoutes: Routes = [
+  { path:'', component: HomeComponent, pathMatch: 'full' },
+  { path:'users', component: UsersComponent, children:[
+    { path:':id/:name', component: UserComponent }
+  ]},
+  { path:'servers', component: ServersComponent, children:[
+    { path:':id', component: ServerComponent},
+    { path:':id/edit', component: EditServerComponent}
+  ]},
+  {path: 'not-found', component: PageNotFoundComponent },
+  {path: '**', redirectTo:'/not-found' }
+];
+````
+
+**IMPORTANTE: Este wildcard deve ser usado como ultima rota do array de rotas. Pois não reconhecerá as rotas que estiverem abaixo dele, trantando como match no wildcard**
+
+### Tratando path inteira
+
+````
+const appRoutes: Routes = [
+ ...
+  {path: '', redirectTo:'/not-found', pathMatch: 'full'  }
+];
+````
+
+Somente será redirect, if the path is ''  (então somente se NÃO tiver outra conteúdo diferente de '').
