@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { ServersService } from '../servers.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 
 @Component({
   selector: 'app-edit-server',
@@ -10,25 +10,32 @@ import { Router } from '@angular/router';
 })
 export class EditServerComponent implements OnInit {
   server: {id: number, name: string, status: string};
-  serverName = '';
-  serverStatus = '';
+  name: string;
+  status: string;
+  allowEdit: boolean = false;
 
-  constructor(private serversService: ServersService, private route: Router) { }
+  constructor(
+    private serversService: ServersService,
+    private route: Router,
+    private activeRoute : ActivatedRoute,
+  ) { }
 
   ngOnInit() {
-    this.server = this.serversService.getServer(1);
-    this.serverName = this.server.name;
-    this.serverStatus = this.server.status;
+    const id = Number(this.activeRoute.snapshot.params['id']);
+    this.allowEdit = (this.activeRoute.snapshot.queryParams['allowEdit'] == true);
+    this.server = this.serversService.getServer(id);
+    this.name = this.server.name;
+    this.status = this.server.status;
+
+    this.activeRoute.queryParams.subscribe(
+      (params: Params)=>{
+        this.allowEdit = (params['allowEdit'] == true);
+        console.log(this.allowEdit);
+      }
+    )
   }
 
   onUpdateServer() {
-    this.serversService.updateServer(this.server.id, {name: this.serverName, status: this.serverStatus});
+    this.serversService.updateServer(this.server.id, {name: this.name, status: this.status});
   }
-
-  navToUser(){
-    let id = 2,
-    name= "teste"
-    this.route.navigate([`users/${id}/${name}`])
-  }
-
 }

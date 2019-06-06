@@ -201,3 +201,141 @@ const appRoutes: Routes = [
 ];
 ````
 Fazendo com que o parametro `id` seja passado de modo dinâmico via rota. 
+
+então no componente, o qual passará os dados:
+
+````
+
+@Component({
+  selector: 'app-component-who-pass',
+  templateUrl: './who-pass.component.html',
+  styleUrls: ['./who-pass.component.css']
+})
+export class WhoPassComponent implements OnInit {
+ ...
+
+  constructor( private route: Router) { }
+
+  ngOnInit() {
+    ...
+  }
+
+  ...
+
+  navToUser(){
+    let id = 2,
+    name= "teste"
+    this.route.navigate([`users/${id}/${name}`])
+  }
+}
+
+````
+
+### Recebendo via Snapshop
+````
+...
+
+@Component({
+  selector: 'app-who-recieve',
+  templateUrl: './who-recieve.component.html',
+  styleUrls: ['./who-recieve.component.css']
+})
+export class WhoRecieveComponent implements OnInit {
+  ...
+  constructor(private activeRoute: ActivatedRoute) { }
+
+  ngOnInit() {
+    this.user = {
+      id: this.activeRoute.snapshot.params['id'],
+      name: this.activeRoute.snapshot.params['name']
+    }
+  }
+}
+
+````
+**Passando dessa forma funciona, porém se você tentar reenviar para este componente, ele não será
+atualizado**
+
+### Recebendo via Router params
+
+````
+...
+
+@Component({
+  selector: 'app-who-recieve',
+  templateUrl: './who-recieve.component.html',
+  styleUrls: ['./who-recieve.component.css']
+})
+export class WhoRecieveComponent implements OnInit {
+  ...
+  constructor(private activeRoute: ActivatedRoute) { }
+
+  ngOnInit() {
+    this.activeRoute.params.subcribe(
+      (params: Params)=>{
+        this.user.id = params['id'];
+        this.users.name = params['name'];
+      }
+    ) 
+  }
+}
+
+````
+
+**Desta forma, como o params de route é um Observable('vide Observable.md'), quando evento é emitido para
+ele, ele captura e muda o estado, por padrão o angular já irá dar um unsusbcribe quando o componente for destruido ('não estiver ativo'), pois se trata de um comportamento nativo no Router params**
+
+## Passando Query params para uma rota
+### Via Template
+No arquivo do template que fará a chamada:
+````
+<a
+  [routerLink] = "['/servers', 5, 'edit']"
+  [queryParams] ="{allowEdit: 1, anotherParam: true}"
+  [fragment]="'Loading'"
+  class="list-group-item">
+  {{ server.name }}
+</a>
+````
+
+a url que será passada é: `http://{urlDaAplicacao}/servers/5/edit?oneParam=1&anotherParam=true#Loading`
+
+### Programaticaly
+````
+@Component({
+  ...
+})
+export class ServersComponent implements OnInit {
+  ...
+  constructor(
+    private router: Router,
+  ) { }
+
+  ...
+
+  loadServer(id: number){
+    this.router.navigate([`/servers/${id}/edit`], {
+      queryParams:{oneParam: 1, anotherParam: true},
+      fragment:'Loading'
+    })
+  }
+}
+
+````
+
+## Nested Routes
+Mudar o `app.modules.ts(ou onde estiver o array de rotas)`:
+````
+const appRoutes: Routes = [
+  { path:'', component: HomeComponent },
+  { path:'users', component: UsersComponent, children:[
+    { path:':id/:name', component: UserComponent }
+  ]},
+  { path:'servers', component: ServersComponent, children:[
+    { path:':id', component: ServerComponent},
+    { path:':id/edit', component: EditServerComponent}
+  ]},
+];
+````
+Como exemplo do caso acima, nos componentes pais, `UsersComponent` e `ServersComponent`
+colocar um segundo `<router-outlet></router-outlet>` o qual renderizará as páginas filhas.
