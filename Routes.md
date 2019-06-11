@@ -2,29 +2,103 @@
 Emulam uma troca de página.
 
 ## Configurando
-1. No `app.modules.ts`. Cria um array do tipo Routes passando path e component.
-2. Registra o `RouterModule.forRoot({arrayDeRotas})`;
+### Meio fácil, porém não segue melhores práticas
+  1. No `app.modules.ts`. Cria um array do tipo Routes passando path e component.
+  2. Registra o `RouterModule.forRoot({arrayDeRotas})`;
 
-`app.modules.ts`:
+  `app.modules.ts`:
+  ````
+  ...
+  import { Routes, RouterModule } from '@angular/router';
+  ...
+
+  const appRoutes: Routes = [
+    { path:'', component: HomeComponent },
+    { path:'users', component: UserComponent },
+    { path:'servers', component: ServersComponent }
+  ];
+
+  @NgModule({
+    declarations: [
+      ...
+    ],
+    imports: [
+      BrowserModule,
+      FormsModule,
+      RouterModule.forRoot(appRoutes)
+    ],
+    providers: [ServersService],
+    bootstrap: [AppComponent]
+  })
+  export class AppModule { }
+
+  ````
+
+  3. Inserir o `<router-outlet></router-outlet>` onde desejar renderizar as rotas.
+  4. Inserir os `routerLink="{rota}"` ao invés do `href="{rota}"`
+  ````
+  <div class="container">
+      <ul class="nav nav-tabs">
+          <li role="presentation" class="nav-item">
+              <a class="nav-link active" routerLink="/">Home</a>
+          </li>
+          <li role="presentation" class="nav-item">
+              <a class="nav-link" routerLink="/servers">Servers</a>
+          </li>
+          <li role="presentation" class="nav-item">
+              <a class="nav-link" [routerLink]="['/users']">Users</a>
+          </li>
+      </ul>
+    <div class="row">
+      <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+  ...
+  ````
+
+
+### Meio Correto
+
+Criar aruivo `app.routes.ts`:
 ````
-...
-import { Routes, RouterModule } from '@angular/router';
-...
+import { Routes, RouterModule } from "@angular/router";
 
-const appRoutes: Routes = [
-  { path:'', component: HomeComponent },
-  { path:'users', component: UserComponent },
-  { path:'servers', component: ServersComponent }
+const appRoutes = [
+  ...rotas
 ];
 
 @NgModule({
+  imports:[
+    RouterModule.forRoot(appRoutes)
+  ],
+  exports:[
+    RouterModule
+  ]
+})
+export class AppRoutesModule {}
+````
+
+No aruivo `app.modules.ts`:
+````
+import { AppRoutesModule } from './app.routes';
+
+@NgModule({
   declarations: [
-    ...
+    AppComponent,
+    HomeComponent,
+    UsersComponent,
+    ServersComponent,
+    UserComponent,
+    EditServerComponent,
+    ServerComponent,
+    PageNotFoundComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    RouterModule.forRoot(appRoutes)
+    AppRoutesModule
   ],
   providers: [ServersService],
   bootstrap: [AppComponent]
@@ -33,29 +107,6 @@ export class AppModule { }
 
 ````
 
-3. Inserir o `<router-outlet></router-outlet>` onde desejar renderizar as rotas.
-4. Inserir os `routerLink="{rota}"` ao invés do `href="{rota}"`
-````
-<div class="container">
-    <ul class="nav nav-tabs">
-        <li role="presentation" class="nav-item">
-            <a class="nav-link active" routerLink="/">Home</a>
-        </li>
-        <li role="presentation" class="nav-item">
-            <a class="nav-link" routerLink="/servers">Servers</a>
-        </li>
-        <li role="presentation" class="nav-item">
-            <a class="nav-link" [routerLink]="['/users']">Users</a>
-        </li>
-    </ul>
-  <div class="row">
-    <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
-      <router-outlet></router-outlet>
-    </div>
-  </div>
-</div>
-...
-````
 ## Navigation
 
 ### routerLink 
@@ -191,7 +242,7 @@ export class ServersComponent implements OnInit {
 ````
 
 ## Passing parametrer to router
-No `app.modules.ts`:
+No `app.routes.ts`:
 ````
 const appRoutes: Routes = [
   { path:'', component: HomeComponent },
@@ -324,7 +375,7 @@ export class ServersComponent implements OnInit {
 ````
 
 ## Nested Routes
-Mudar o `app.modules.ts(ou onde estiver o array de rotas)`:
+Mudar o `app.routes.ts(ou onde estiver o array de rotas)`:
 ````
 const appRoutes: Routes = [
   { path:'', component: HomeComponent },
@@ -354,7 +405,7 @@ editServer(){
 ````
 
 ## Trantando páginas desconhecidas:
-Mudar o `app.modules.ts` ou onde estiver array de rotas.
+Mudar o `app.routes.ts` ou onde estiver array de rotas.
 
 ````
 const appRoutes: Routes = [
@@ -383,3 +434,104 @@ const appRoutes: Routes = [
 ````
 
 Somente será redirect, if the path is ''  (então somente se NÃO tiver outra conteúdo diferente de '').
+
+## Protegendo Rotas (Guards)
+Criar um serviço para proteção da rota. Neste exemplo utilizaremos o `auth-guard.service.ts`
+este serviço usa outro para que possa validar se a rota está protejida ou não.
+neste exemplo ele verifica se o retorno do método `isAuthenticated` do serviço `AuthService` retorna `true`(autenticado) ou `false`(não autenticado).
+
+### Protegendo uma única rota
+
+ ````
+ @Injectable()
+export class AuthGuard implements CanActivate, CanActivateChild {
+  constructor(private authService: AuthService, private router: Router){}
+
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state:RouterStateSnapshot
+  ): Observable<boolean> | Promise<boolean> | boolean  {
+      return this.authService.isAuthenticated().then(
+        (auth: boolean)=>{
+          if(auth){
+            return true;
+          }
+
+          this.router.navigate(['/']);
+          return false;
+      }
+    )
+  }
+}
+ ````
+
+ no arquivo de rotas `app.routes.ts`, modificar a rota com o atributo `canActivate`, passando como parâmetro um array da classe criada para o guard, no caso `AuthGuard`:
+
+ ````
+ ...
+ const appRoutes:  Routes = [
+  { path:'', component: HomeComponent },
+  { path:'users', component: UsersComponent, children:[
+    { path:':id/:name', component: UserComponent }
+  ]},
+  { path:'servers',
+    canActivate:[AuthGuard],
+    component: ServersComponent,
+    children:[
+      { path:':id', component: ServerComponent},
+      { path:':id/edit', component: EditServerComponent}
+    ]
+  },
+  {path: 'not-found', component: PageNotFoundComponent },
+  {path: '**', redirectTo:'/not-found' }
+];
+...
+ ````
+
+ ### Protejendo rotas filhas
+ ````
+ @Injectable()
+export class AuthGuard implements CanActivate, CanActivateChild {
+  constructor(private authService: AuthService, private router: Router){}
+
+  canActivate(route: ActivatedRouteSnapshot, state:RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+      return this.authService.isAuthenticated().then(
+        (auth: boolean)=>{
+          if(auth){
+            return true;
+          }
+
+          this.router.navigate(['/']);
+          return false;
+      }
+    )
+  }
+
+  canActivateChild( route: ActivatedRouteSnapshot, state:RouterStateSnapshot ): Observable<boolean> | Promise<boolean> | boolean  {
+    return this.canActivate(route, state);
+  }
+}
+ ````
+
+ no arquivo de rotas `app.routes.ts`, modificar a rota que protegerá as filhas com o atributo `canActivateChild`, passando como parâmetro um array da classe criada para o guard, no caso `AuthGuard`:
+
+ ````
+ ...
+ const appRoutes:  Routes = [
+  { path:'', component: HomeComponent },
+  { path:'users', component: UsersComponent, children:[
+    { path:':id/:name', component: UserComponent }
+  ]},
+  { path:'servers',
+    canActivateChild:[AuthGuard],
+    component: ServersComponent,
+    children:[
+      { path:':id', component: ServerComponent},
+      { path:':id/edit', component: EditServerComponent}
+    ]
+  },
+  {path: 'not-found', component: PageNotFoundComponent },
+  {path: '**', redirectTo:'/not-found' }
+];
+...
+````
