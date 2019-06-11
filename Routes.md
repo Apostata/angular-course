@@ -440,6 +440,25 @@ Criar um serviço para proteção da rota. Neste exemplo utilizaremos o `auth-gu
 este serviço usa outro para que possa validar se a rota está protejida ou não.
 neste exemplo ele verifica se o retorno do método `isAuthenticated` do serviço `AuthService` retorna `true`(autenticado) ou `false`(não autenticado).
 
+inserir os serviços no arquivo `app.module.ts`:
+````
+@NgModule({
+  declarations: [
+   ...
+  ],
+  imports: [
+    ...
+  ],
+  providers: [
+    ...
+    AuthGuard,
+    AuthService,
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+````
+
 ### Protegendo uma única rota
 
  ````
@@ -534,4 +553,120 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   {path: '**', redirectTo:'/not-found' }
 ];
 ...
+````
+
+### Proibindo abandodo da rota (canDeactivate)
+
+Serve para, por exemplo, probibir usuário de deixar a rota caso haja alterações não salvas.
+
+Criar um servico para isso, no caso `can-deactivate-gard.service.ts`
+
+````
+import { Observable } from "rxjs/Observable";
+import { CanDeactivate, RouterStateSnapshot, ActivatedRouteSnapshot } from "@angular/router";
+
+export interface CanComponentDeactivate {
+  canDectivate: () => Observable<boolean> | Promise<boolean> | boolean
+}
+
+export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate> {
+  canDeactivate (
+    component: CanComponentDeactivate,
+    currentRoute: ActivatedRouteSnapshot,
+    currentState: RouterStateSnapshot,
+    nextState?: RouterStateSnapshot
+  ): Observable<boolean> | Promise<boolean> | boolean {
+    return component.canDectivate(); // metodo da interface criada acima
+  }
+}
+````
+
+no arquivo `app.routes.ts`, inserir o atributo `canDeactivate`, passando como parametro um array com o a classe do guard, no caso `CanDeactivateGuard`:
+````
+{ path:'servers',
+    canActivateChild:[AuthGuard],
+    component: ServersComponent,
+    children:[
+      { path:':id', component: ServerComponent},
+      { path:':id/edit',
+        canDeactivate:[CanDeactivateGuard],
+        component: EditServerComponent
+      }
+    ]
+  },
+````
+
+no componente que terá a restrição de rota, no caso `edit-server.components.ts`, implementar a interface criada, no caso `CanComponentDeactivate`, que obriga a implementação do método `canDeactivate`:
+
+````
+export class EditServerComponent implements OnInit, CanComponentDeactivate {
+  server: {id: number, name: string, status: string};
+  name: string;
+  status: string;
+  allowEdit: boolean = false;
+  changesSaved: boolean = false;
+
+  constructor(
+    private serversService: ServersService,
+    private router: Router,
+    private activeRoute : ActivatedRoute,
+  ) { }
+
+  ngOnInit() {
+    ...
+  }
+
+  onUpdateServer() {
+    ...
+  }
+
+  canDectivate(): Observable<boolean> | Promise<boolean> | boolean {
+    if(!this.allowEdit){
+      return true;
+    }
+    if((this.name !== this.server.name || this.status !== this.server.status) && !this.changesSaved){
+      return confirm('Você deseja descartar as mudanças Realizadas?');
+    }
+    else{
+      return true;
+    }
+  }
+}
+
+````
+
+## Resolver
+É um interceptador de rotas, que pode inicializar um componente, chamando um serviço, quando houver uma mudança de rotas.
+exemplo de resolver, `server-resolver.service.ts`. Como é um serviço que chamará outro, é necessário usar o decorator @Injectable():
+
+O metodo `getServer(id)`é chamado do serviço `ServersService` passando como parametro o `id` passado via params da rota. Exemplo de rota: `servers/:id`
+
+````
+@Injectable()
+export class ServerResolver implements Resolve<Server> {
+  constructor(private serversService: ServersService){}
+
+  resolve(activateRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot)
+  : Observable<Server> | Promise<Server> | Server {
+    return this.serversService.getServer(Number(activateRoute.params.id));
+  }
+}
+````
+
+## Routes in very old Browsers
+
+No arquivo `app.routes.ts`, usar `{useHash: true}`;
+fazendo com que uma url, por exemplo : `{domínio}/servers/:id` 
+vire `{domínio}/#/servers/:id`.
+o backend só se importa com o que está de fato antes do hash.
+````
+...
+@NgModule({
+  imports:[
+    RouterModule.forRoot(appRoutes, useHash: true)
+  ],
+  exports:[
+    RouterModule
+  ]
+})
 ````

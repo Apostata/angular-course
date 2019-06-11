@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
 import { ServersService } from '../servers.service';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router, Data } from '@angular/router';
+import { Server } from './server-resolver.service';
 
 @Component({
   selector: 'app-server',
@@ -9,7 +10,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
   styleUrls: ['./server.component.css']
 })
 export class ServerComponent implements OnInit {
-  server: {id: number, name: string, status: string};
+  server: Server;
   allowEdit: boolean;
   constructor(
     private serversService: ServersService,
@@ -18,23 +19,10 @@ export class ServerComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    const id = Number(this.activeRoute.snapshot['id']);
-    this.allowEdit = (this.activeRoute.snapshot.queryParams['allowEdit']== true);
-    console.log('init', this.allowEdit)
-    this.server = this.serversService.getServer(id);
-
-    this.activeRoute.params.subscribe(
-      (params: Params)=>{
-        this.server = this.serversService.getServer(Number(params['id']));
-      }
-    );
-
-    this.activeRoute.queryParams.subscribe(
-      (params: Params)=>{
-        this.allowEdit = (params['allowEdit'] == true);
-      }
-    );
-
+    this.activeRoute.data.subscribe((data:Data)=>{
+      console.log(data);
+      this.server = data['server'];
+    });
   }
 
   editServer(){
