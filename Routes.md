@@ -653,6 +653,28 @@ export class ServerResolver implements Resolve<Server> {
 }
 ````
 
+no `app.routes.ts`:
+````
+const appRoutes:  Routes = [
+  ...
+  { path:':id', component: ServerComponent, resolve:{server:ServerResolver}},
+  ...
+];
+
+````
+
+no component `ServerComponent`:
+````
+...
+ngOnInit() {
+  this.activeRoute.data.subscribe((data:Data)=>{
+    console.log(data);
+    this.server = data['server'];
+  });
+}
+...
+````
+
 ## Routes in very old Browsers
 
 No arquivo `app.routes.ts`, usar `{useHash: true}`;

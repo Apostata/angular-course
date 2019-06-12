@@ -20,7 +20,7 @@ export class RecipesSercive {
     new Recipe(
       'Test Recipe 2',
       'Simples teste de receita dois',
-      'https://www.tasteofhome.com/wp-content/uploads/2017/10/Healthier-than-Egg-Rolls_EXPS_SDON17_55166_C06_23_6b-696x696.jpg',
+      'https://www.tasteofhome.com/wp-content/uploads/0001/01/Chipotle-Berry-Fruit-Salsa_EXPS_SDJJ19_94282_B02_12_7b-696x696.jpg',
       [
         new Ingredient('Cebolas', 1),
         new Ingredient('Alho', 1)
@@ -36,5 +36,10 @@ export class RecipesSercive {
 
   sendIngredients(ingredients: Ingredient[]){
     this.shoppingListService.addIngredients(ingredients);
+  }
+
+  getRecipe(idx:number){
+    const recipes = this.recipes.slice();
+    return recipes[idx];
   }
 }
