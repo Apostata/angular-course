@@ -19,9 +19,9 @@ export class RecipeItemComponent implements OnInit{
   ngOnInit(){
 
   }
-
-  onSelectRecipe(){
-    this.recipeService.selectedRecipe.emit(this.recipe);
-    this.route.navigate([`${this.index}`], {relativeTo: this.activeRoute});
-  }
+  // com as rotas, não é mais necessário chamar esta função pelo click, apenas passar
+  // os parametros para a rota e puxa-los no componente que será chamado
+  // onSelectRecipe(){
+  //   this.recipeService.selectedRecipe.emit(this.recipe);
+  // }
 }

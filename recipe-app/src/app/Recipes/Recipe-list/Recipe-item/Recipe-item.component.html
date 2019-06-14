@@ -1,6 +1,7 @@
 <div class="col-12">
     <!-- <a class="list-group-item list-group-item-action clearfix" routerLink="/recipes/{{index}}" > -->
-    <a class="list-group-item list-group-item-action clearfix" (click)="onSelectRecipe()" style="cursor:pointer;">
+    <!-- <a class="list-group-item list-group-item-action clearfix" (click)="onSelectRecipe()" style="cursor:pointer;"> -->
+      <a class="list-group-item list-group-item-action clearfix" [routerLink]=index routerLinkActive="active" style="cursor:pointer;">
       <div class="row">
         <div class="col col-9 order-1">
           <h4 class="list-group-item-heading">{{recipe.name}}</h4>

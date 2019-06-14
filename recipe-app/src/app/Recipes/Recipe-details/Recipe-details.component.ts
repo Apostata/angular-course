@@ -13,16 +13,12 @@ export class RecipeDetailsComponent implements OnInit{
   constructor(private recipesService: RecipesSercive, private activeRoute: ActivatedRoute){}
 
   ngOnInit(){
-    let idx = this.activeRoute.snapshot.params['idx'];
-    this.recipe = this.recipesService.getRecipe(idx);
-
     this.activeRoute.params.subscribe(
       (params: Params)=>{
-        idx = params['idx'];
+        let idx: number = Number(params['idx']);
         this.recipe = this.recipesService.getRecipe(idx);
       }
-    )
-
+    );
   }
 
   toShoppingList(){
