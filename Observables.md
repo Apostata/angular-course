@@ -205,3 +205,65 @@ customObservablePipe = customObservable.pipe(
 **[Lista de operators em: https://www.learnrxjs.io/operators/](https://www.learnrxjs.io/operators/)**
 
 ## Subjects
+Subjects, são como tipos especiais de Observables usado como padrão (boas ptáticas) para troca de informações em cross-components.
+
+No arquivo do serviço, ao invés de usar `EventEmitter`, usará o `Subject`:
+
+**Trocando o EventEmitter para Subject**
+Trocando de:
+````
+import { Injectable, EventEmitter } from "@angular/core";
+
+@Injectable({providedIn:'root'})
+export class UserService {
+  activateEmitter : EventEmitter<boolean> = new EventEmitter<boolean>();
+}
+````
+
+para:
+````
+import { Injectable } from "@angular/core";
+import { Subject } from 'rxjs';
+
+@Injectable({providedIn:'root'})
+export class UserService {
+  activateEmitter : Subject<boolean> = new Subject<boolean>();
+}
+````
+
+Ambos necessitam da inscrição :
+````
+...
+  ngOnInit(){
+    this.usersSubscription = this.userService.activateEmitter.subscribe((activated)=>{
+      this.isActivated = activated;
+    });
+  }
+
+  ngOnDestroy(){
+    this.usersSubscription.unsubscribe();
+  }
+...
+````
+e no componente que recebe:
+
+Com `EventEmitter`:
+````
+...
+  onActivate(){
+    this.userService.activateEmitter.emit(true);
+  }
+...
+````
+
+Com `Subject`:
+````
+...
+  onActivate(){
+    this.userService.activateEmitter.next(true);
+  }
+...
+````
+
+**NOTA: Em components que emitam eventos por @Output() não usar `Subject` e sim `EventEmitter`**
+

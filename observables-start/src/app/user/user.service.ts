@@ -1,6 +1,7 @@
-import { Injectable, EventEmitter } from "@angular/core";
+import { Injectable } from "@angular/core";
+import { Subject } from 'rxjs';
 
 @Injectable({providedIn:'root'})
 export class UserService {
-  activateEmitter : EventEmitter<boolean> = new EventEmitter<boolean>();
+  subject : Subject<boolean> = new Subject<boolean>();
 }
