@@ -303,8 +303,12 @@ export class CockpitComponent implements OnInit {
   }
 }
 ````
-Desta forma em `@ViewChild('nome da referência')`, acessa o DOM com um Wrapper chamado nativeElement
+Desta forma em `@ViewChild('nome da referência', {static:false})`, acessa o DOM com um Wrapper chamado nativeElement
 
+**Nota: no angular 8 é necessário passar 2 parametros para a @ViewChild agora:
+`@ViewChild('nome da referência' {static:'false'})`
+o static manter parametros caso uma mudança seja feita, no caso, não captura os parametros.
+**
 
 
 ### Passando Conteudo HTML para outro componente
