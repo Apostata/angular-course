@@ -336,3 +336,63 @@ this.userForm.reset();
 `
 
 **NOTA: pode ser passado um objeto como o de setValue passando cada campo do formulário com o valor inicial desejado**
+
+## Reactive (Criando Formulário via typescript)
+
+### Setup
+Importar `FormGroup` e definir uma variável deste tipo no typescript relacionado a página do form.
+
+````
+import { Component } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  genders = ['male', 'female'];
+  signupForm: FormGroup
+}
+````
+
+em `app.modules.ts`, importar  `ReactiveFormsModule` e incluir no array de `imports` 
+
+````
+import { ReactiveFormsModule } from '@angular/forms';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    ReactiveFormsModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+````
+
+### Adicionando Controles ao formulário
+Importar `FormControl` de `@angular/forms` e instanciar um novo controle cada vez que precisar validar um input.
+
+````
+...
+export class AppComponent implements OnInit {
+  genders = ['male', 'female'];
+  signupForm: FormGroup;
+
+  ngOnInit(){
+    this.signupForm = new FormGroup({
+      'username': new FormControl(null),
+      'email': new FormControl(null),
+      'gender': new FormControl('male')
+    });
+  }
+ ...
+}
+
+````
